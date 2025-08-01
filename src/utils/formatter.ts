@@ -141,9 +141,11 @@ function truncateTitle(title: string, maxLength: number = 60): string {
 }
 
 function escapeMarkdown(text: string): string {
-  // More selective escaping to preserve readability
+  // Escape only necessary Markdown characters
   return text
-    .replace(/([_*[\]()~`>#+\-=|{}.!])/g, '\\$1')
+    .replace(/([_*[\]()~`>#+|{}])/g, '\\$1')
+    .replace(/\\/g, '') // Remove existing backslashes
+    .replace(/\s+/g, ' ') // Normalize spaces
     .trim();
 }
 

@@ -103,15 +103,33 @@ export class N8NService {
 
   private simpleSummary(content: string[], query: string): string {
     // Simple fallback summary when N8N is not available
-    const combined = content.join(' ');
-    const sentences = combined.match(/[^.!?]+[.!?]+/g) || [];
-    
-    // Extract most relevant sentences
-    const queryWords = query.toLowerCase().split(' ');
-    const relevantSentences = sentences
-      .filter(s => queryWords.some(word => s.toLowerCase().includes(word)))
-      .slice(0, 5);
+    if (content.length === 0) {
+      return 'Информация не найдена.';
+    }
 
-    return relevantSentences.join(' ') || 'No relevant summary available.';
+    // Take first non-empty content
+    const firstContent = content.find(c => c && c.trim().length > 0) || content[0];
+    
+    // Clean up the content
+    const cleaned = firstContent
+      .replace(/\s+/g, ' ')
+      .replace(/\n{2,}/g, '\n')
+      .trim();
+    
+    // Split into sentences
+    const sentences = cleaned.match(/[^.!?]+[.!?]+/g) || [];
+    
+    // Take first 3-5 sentences as summary
+    const summary = sentences
+      .slice(0, 5)
+      .join(' ')
+      .trim();
+    
+    // Limit length
+    if (summary.length > 500) {
+      return summary.substring(0, 497) + '...';
+    }
+    
+    return summary || 'Краткое описание недоступно.';
   }
 }

@@ -2,6 +2,10 @@
 
 # Kill any existing bot processes
 pkill -f "tsx src/index" || true
+pkill -f "npm run start" || true
+
+# Wait a moment for processes to stop
+sleep 2
 
 # Start the bot in background
 echo "Starting bot in background..."
@@ -14,8 +18,10 @@ echo "Bot started with PID: $BOT_PID"
 # Save PID to file
 echo $BOT_PID > bot.pid
 
+# Wait for bot to start
+sleep 5
+
 # Show initial logs
-sleep 3
 echo "Initial logs:"
 tail -n 20 bot.log
 
