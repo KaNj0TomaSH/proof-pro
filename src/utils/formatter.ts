@@ -141,12 +141,18 @@ function truncateTitle(title: string, maxLength: number = 60): string {
 }
 
 function escapeMarkdown(text: string): string {
-  // Escape only necessary Markdown characters
-  return text
-    .replace(/([_*[\]()~`>#+|{}])/g, '\\$1')
-    .replace(/\\/g, '') // Remove existing backslashes
+  if (!text) return '';
+  
+  // First, normalize the text
+  let normalized = text
     .replace(/\s+/g, ' ') // Normalize spaces
     .trim();
+  
+  // Then escape Markdown special characters
+  // Order matters - escape backslashes first
+  return normalized
+    .replace(/\\/g, '\\\\') // Escape backslashes
+    .replace(/([_*[\]()~`>#+\-=|{}.!])/g, '\\$1'); // Escape special chars
 }
 
 export function formatError(error: string): string {

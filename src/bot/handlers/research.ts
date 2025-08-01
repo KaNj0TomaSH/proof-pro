@@ -64,15 +64,32 @@ export async function handleResearch(ctx: Context) {
     // Split message if too long
     const chunks = splitMessage(formattedResults);
     
-    for (const chunk of chunks) {
-      await ctx.replyWithMarkdown(chunk, {
-        // @ts-ignore
-        disable_web_page_preview: true,
-      });
+    try {
+      for (const chunk of chunks) {
+        await ctx.replyWithMarkdown(chunk, {
+          // @ts-ignore
+          disable_web_page_preview: true,
+        });
+      }
+    } catch (sendError) {
+      console.error('Error sending formatted message:', sendError);
+      // Fallback to plain text if Markdown fails
+      await ctx.reply(
+        'Результаты исследования:\n\n' +
+        `Запрос: ${results.originalClaim}\n` +
+        `Вердикт: ${results.verdict}\n` +
+        `Проанализировано источников: ${results.sources.length}\n\n` +
+        'К сожалению, не удалось отформатировать полные результаты. ' +
+        'Попробуйте упростить запрос.'
+      );
     }
 
     // Delete processing message
-    await ctx.telegram.deleteMessage(chatId, processingMessage.message_id);
+    try {
+      await ctx.telegram.deleteMessage(chatId, processingMessage.message_id);
+    } catch (deleteError) {
+      // Ignore delete errors
+    }
 
   } catch (error) {
     console.error('Research error:', error);
