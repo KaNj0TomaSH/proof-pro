@@ -26,6 +26,11 @@ export const config = {
     enabled: !!process.env.GOOGLE_TRANSLATE_API_KEY,
     targetLanguage: 'ru', // Default to Russian
   },
+  locale: {
+    default: 'ru-RU',
+    dateFormat: 'DD.MM.YYYY',
+    timeFormat: 'HH:mm',
+  },
 };
 
 export function validateConfig() {
