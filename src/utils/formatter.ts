@@ -19,15 +19,15 @@ export function formatResults(result: CrossCheckResult): string {
   sections.push(formatSources(result));
 
   // Join sections with proper spacing
-  return sections.join('\n\n➖➖➖➖➖➖➖➖➖➖\n\n');
+  return sections.join('\n\n------------------------\n\n');
 }
 
 function formatHeader(result: CrossCheckResult): string {
   const verdictEmoji = {
-    'verified': '✅',
-    'disputed': '❌',
-    'unverified': '❓',
-    'mixed': '⚠️',
+    'verified': '✓',
+    'disputed': '✗',
+    'unverified': '?',
+    'mixed': '!',
   };
 
   const verdictText = {
@@ -39,21 +39,21 @@ function formatHeader(result: CrossCheckResult): string {
 
   const confidence = Math.round(result.confidence * 100);
 
-  return `📊 *РЕЗУЛЬТАТЫ ИССЛЕДОВАНИЯ*
+  return `*РЕЗУЛЬТАТЫ ИССЛЕДОВАНИЯ*
 
-📌 *Запрос:*
+*Запрос:*
 _${escapeMarkdown(result.originalClaim)}_
 
-🔍 *Вердикт:* ${verdictEmoji[result.verdict]} ${verdictText[result.verdict]}
-📊 *Уверенность:* ${formatPercentage(confidence)}
-📚 *Проанализировано:* ${formatSourceCount(result.sources.length)}`;
+*Вердикт:* ${verdictEmoji[result.verdict]} ${verdictText[result.verdict]}
+*Уверенность:* ${formatPercentage(confidence)}
+*Проанализировано:* ${formatSourceCount(result.sources.length)}`;
 }
 
 function formatSummaries(summaries: TopicSummary[]): string {
-  let output = '📝 *КРАТКОЕ СОДЕРЖАНИЕ ПО ТЕМАМ*';
+  let output = '*КРАТКОЕ СОДЕРЖАНИЕ ПО ТЕМАМ*';
 
   for (const summary of summaries) {
-    output += `\n\n🔸 *${escapeMarkdown(summary.topic)}*\n`;
+    output += `\n\n* *${escapeMarkdown(summary.topic)}*\n`;
     
     // Split summary into paragraphs for better readability
     const paragraphs = summary.summary.split(/\n+/).filter(p => p.trim());
@@ -61,14 +61,14 @@ function formatSummaries(summaries: TopicSummary[]): string {
       output += `\n${escapeMarkdown(paragraph.trim())}`;
     }
     
-    output += `\n\n_📎 Использовано ${formatSourceCount(summary.sources.length)}_`;
+    output += `\n\n_Использовано ${formatSourceCount(summary.sources.length)}_`;
   }
 
   return output;
 }
 
 function formatQuotes(result: CrossCheckResult): string {
-  let output = '💬 *КЛЮЧЕВЫЕ ЦИТАТЫ*';
+  let output = '*КЛЮЧЕВЫЕ ЦИТАТЫ*';
 
   // Get top quotes from all sources
   const allQuotes = result.sources
@@ -93,29 +93,29 @@ function formatSingleQuote(quote: Quote): string {
   
   // Original quote with proper formatting
   const cleanText = quote.text.trim().replace(/\s+/g, ' ');
-  output += `💭 _"${escapeMarkdown(cleanText)}"_`;
+  output += `_"${escapeMarkdown(cleanText)}"_`;
   
   // Translation if available
   if (quote.translation) {
     const cleanTranslation = quote.translation.trim().replace(/\s+/g, ' ');
-    output += `\n   \n   🇷🇺 _"${escapeMarkdown(cleanTranslation)}"_`;
+    output += `\n   \n   [RU] _"${escapeMarkdown(cleanTranslation)}"_`;
   }
   
   // Source with better formatting
-  output += `\n   \n   🔗 [Источник](${quote.sourceUrl})`;
+  output += `\n   \n   [Источник](${quote.sourceUrl})`;
 
   return output;
 }
 
 function formatSources(result: CrossCheckResult): string {
-  let output = '📚 *ПРОАНАЛИЗИРОВАННЫЕ ИСТОЧНИКИ*';
+  let output = '*ПРОАНАЛИЗИРОВАННЫЕ ИСТОЧНИКИ*';
 
   // Group by trusted/untrusted
   const trustedSources = result.sources.filter(s => s.source.isTrusted);
   const otherSources = result.sources.filter(s => !s.source.isTrusted);
 
   if (trustedSources.length > 0) {
-    output += '\n\n✅ *Доверенные источники:*';
+    output += '\n\n[✓] *Доверенные источники:*';
     for (const source of trustedSources) {
       const relevance = Math.round(source.relevanceScore * 100);
       const title = truncateTitle(source.source.title);
@@ -124,7 +124,7 @@ function formatSources(result: CrossCheckResult): string {
   }
 
   if (otherSources.length > 0) {
-    output += '\n\n⚪ *Другие источники:*';
+    output += '\n\n[o] *Другие источники:*';
     for (const source of otherSources) {
       const relevance = Math.round(source.relevanceScore * 100);
       const title = truncateTitle(source.source.title);
@@ -148,9 +148,9 @@ function escapeMarkdown(text: string): string {
 }
 
 export function formatError(error: string): string {
-  return `❌ *ОШИБКА ПРИ ВЫПОЛНЕНИИ ИССЛЕДОВАНИЯ*
+  return `*ОШИБКА ПРИ ВЫПОЛНЕНИИ ИССЛЕДОВАНИЯ*
 
-⚠️ ${escapeMarkdown(error)}
+${escapeMarkdown(error)}
 
 *Попробуйте:*
 • Переформулировать запрос
@@ -165,7 +165,7 @@ export function formatProgress(stage: string, current: number, total: number): s
   const percentage = Math.round((current / total) * 100);
   const progressBar = createProgressBar(percentage);
 
-  return `🔄 *${stage}*
+  return `*${stage}*
 
 ${progressBar} ${formatPercentage(percentage)}
 
@@ -176,21 +176,21 @@ function createProgressBar(percentage: number): string {
   const filled = Math.round(percentage / 10);
   const empty = 10 - filled;
   
-  return '▓'.repeat(filled) + '░'.repeat(empty);
+  return '[' + '='.repeat(filled) + '-'.repeat(empty) + ']';
 }
 
 // New helper function for welcome messages
 export function formatWelcome(): string {
-  return `🔍 *Добро пожаловать в Research Bot!*
+  return `*Добро пожаловать в Research Bot!*
 
 Я помогу вам найти и проверить информацию по любой теме.
 
 *Что я умею:*
-• 🔍 Искать информацию в надежных источниках
-• ✅ Проверять факты (fact-checking)
-• 💬 Выделять ключевые цитаты
-• 🌐 Переводить найденную информацию
-• 📊 Создавать краткие выводы
+• Искать информацию в надежных источниках
+• Проверять факты (fact-checking)
+• Выделять ключевые цитаты
+• Переводить найденную информацию
+• Создавать краткие выводы
 
 *Как использовать:*
 Просто отправьте мне ваш запрос текстом.
@@ -200,5 +200,5 @@ export function formatWelcome(): string {
 • "Климатические изменения 2024"
 • "Последние новости о выборах"
 
-Готов помочь с вашим исследованием! 🚀`;
+Готов помочь с вашим исследованием!`;
 }

@@ -10,13 +10,13 @@ export async function handleSources(ctx: Context) {
     return acc;
   }, {} as Record<string, typeof trustedSources>);
 
-  let message = '📚 *Доверенные источники информации*\n\n';
+  let message = '*Доверенные источники информации*\n\n';
 
   const categoryNames: Record<string, string> = {
-    'news': '📰 Новостные агентства',
-    'fact-check': '✅ Факт-чекинг',
-    'academic': '🎓 Академические источники',
-    'official': '🏛️ Официальные источники'
+    'news': 'Новостные агентства',
+    'fact-check': 'Факт-чекинг',
+    'academic': 'Академические источники',
+    'official': 'Официальные источники'
   };
 
   for (const [category, sources] of Object.entries(categorizedSources)) {
